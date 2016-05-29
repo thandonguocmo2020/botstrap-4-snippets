@@ -1,0 +1,51 @@
+{
+    "name": "bootstrap-4-snippets-extension",
+    "title": "bootstrap-4-snippets-extension",
+    "description": "A collection of Bootstrap 4 snippets for Brackets. Should contribute to develop !!!",
+    "homepage": "https://github.com/thandonguocmo2020/botstrap-4-snippets",
+    "version": "0.0.14",
+    "author": "hoang hiep    <thandonguocmo2020@gmail.com> ",
+    "license": "MIT",
+    "categories": "editing",
+    "keywords": [
+        "brackets",
+        "bootstrap 4",
+        "snippets",
+		"code",
+		"tag",
+		"html",
+		"block",
+		"generator",
+		"reference",
+		"theme",
+		"portfolio",
+		"css",
+		"cdn",
+		"javascript",
+		"template",
+		"example",
+		"image",
+		"gallery",
+		"device",
+		"screen",
+		"keyboard",
+		"tip",
+		"hint",
+		"shortcodes",
+		"document",
+		"autocomplete",
+        "media",
+        "queries",
+        "jasny"
+    ],
+    "files": [
+        "main.js",
+        "snippet.js",
+		"trackingClient.js",
+		"bs-func.txt",
+        "README.md"
+    ],
+    "engines": {
+        "brackets": ">=0.31.3"
+    }
+}
