@@ -131,7 +131,7 @@ define(function (require, exports, module) {
 
     // Container 
     snippets.bs4container = '<div class="container">\n</div>\n';
-    snippets.bs4containerfuil = '<div class="container-fuil">\n</div>\n';
+    snippets.bs4containerfluid = '<div class="container-fluid">\n</div>\n';
 
     // Clearfix
 
