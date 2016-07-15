@@ -4,7 +4,7 @@ bs4html5template
 
 
 bs4container
-bs4containerfuil
+bs4containerfluid
 
 bs4row
 bs4rowcol
