@@ -1,0 +1,143 @@
+let mongoose = require("mongoose");
+let Schema = mongoose.Schema;
+let crypto = require('crypto'); // module mã hóa chuỗi module gốc của nodejs tương tự như bcrypt
+let Hashids = require('hashids'); // tạo id từ chữ số giống uuid
+let hashids = new Hashids('users are the best', 5, '0123456789abcdhf');
+let authTypes = ['github', 'twitter', 'facebook', 'google'];
+// let pad = require('pad');
+
+var UserSchema = new mongoose.Schema({
+    name: { type: Boolean, default: true }, // tên 
+    username: { type: String, trim: true, lowercase: true, require: true }, // tài khoản
+    email: { type: String, trim: true, require: true },  // email
+    role: { type: String, trim: true, default: "member" }, // role
+    active: { type: String, trim: true }, // active 
+    created: { type: Date, default: Date.now }, // ngày tạo
+    update: { type: Date }, // cập nhập
+    lastLogin: { type: Date, default: Date.now }, // đăng nhâp lần cuối
+    salt: String, // chuỗi kết hợp cùng mã hóa mật khẩu
+    hashedPassword: String, // pass mã hóa
+    provider: String // email được tạo ra từ dịch vụ nào 
+
+},
+    { collection: 'users' } // collection được tạo
+
+);
+// đánh chỉ mục
+
+UserSchema.index({ email: 1, hashedPassword: 1 }, { unique: true });
+
+
+// /* method  sử dụng */
+
+UserSchema.methods.authenticate = (plantext) => {
+    // mã hóa mật khẩu khớp với chuỗi mã hóa
+    return this.encryptPassword(plantext) === this.hashedPassword
+};
+
+UserSchema.methods.makeSalt = function () {
+    return crypto.randomBytes(16).toString('base64');
+};
+
+UserSchema.methods.encryptPassword = (password) => {
+    if (!password && !this.salt) return '';
+    let salt = new Buffer(this.salt, 'base64');
+
+    // hàm mã hóa
+    // return crypto.pbkdf2Sync('secret', 'salt', 100000, 512, 'sha512').toString("hex");
+    var hashedPassword = crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString("hex");
+
+    return hashedPassword;
+}
+
+
+
+// tạo ra biến có thể dùng cho setter hoặc getter
+UserSchema
+    .virtual("password")
+    .set(function (password) {
+        this._password = password; // lưu pass mà có thể dùng trong setter và getter nhưng ko lưu vào database
+
+        this.salt = this.makeSalt();// gọi hàm mã hóa chuỗi
+        this.hashedPassword = User.encryptPassword(password); // gọi hàm mã hóa password
+    })
+    .get(function (password) {
+        return this._password;
+    })
+
+
+UserSchema
+    .virtual("profile")
+    .get(() => {
+        return {
+            'name': this.name,
+            'role': this.role
+        }
+    });
+
+
+UserSchema
+    .virtual("token")
+    .get(() => {
+        return {
+            '_id': this._id,
+            'role': this.role
+        }
+    });
+
+
+UserSchema
+    .path("email")
+    .validate((email) => {
+        if (authTypes.indexOf(this.provider) !== -1) return true;
+        return email.length;
+    }, 'Email không được rỗng');
+
+
+UserSchema
+    .path("hashedPassword")
+    .validate((hashedPassword) => {
+        if (authTypes.indexOf(this.provider) !== -1) return true;
+        return hashedPassword.length;
+
+    }, "Mật khẩu không thể rỗng");
+
+
+UserSchema
+    .path("email")
+    .validate((value, reponse) => {
+        // let seft = this;
+        // do cơ chế bất đồng bộ lên ta có thể gọi User của model khai báo trong file.. Khai báo ở cuối nhóe
+        User.findOne({ 'email': value }, (err, user) => {
+            if (err) throw err;
+            if (user) {
+                if (seft.id == user.id) return reponse(true);
+                reponse(true);
+            }
+        })
+    }, "Các địa chỉ email đã được sử dụng trong ứng dụng.");
+
+
+
+// // xác nhận sự hiện diện của email và password trong data
+let validatePresenceOf = (v) => {
+    return v && v.length;
+}
+
+
+// // trước khi save check
+UserSchema
+    .pre('save', (next) => {
+        // isNew trong mongoo kiểm tra sự sẵn có của doc trc khi thêm mới
+        if (!this.isNew) return next();
+        // nếu đúng nó là mới và phủ định password và dịch vụ tồn tại thì return error kèm theo phản ứng
+        if (!validatePresenceOf(this.hashedPassword) && authTypes.indexOf(this.provider) === -1) {
+            next(new Error("Mật khẩu không hợp lệ"));
+        } else {
+            next();
+        }
+    });
+
+
+
+module.exports = User = mongoose.model('User', UserSchema);
