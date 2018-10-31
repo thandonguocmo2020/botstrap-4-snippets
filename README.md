@@ -14,7 +14,7 @@ A collection of [Bootstrap](http://getbootstrap.com/) snippets for [Brackets](ht
 #### Extension Manager
 
 1. Under main menu select **File > Extension Manager...**
-2. Search for "ootstrap 4 Snippets"
+2. Search for "Bootstrap 4 Snippets"
 3. Click "Install"
 
 ## How to use
@@ -83,7 +83,7 @@ http://brackets.dnbard.com/author/Antonio%20Carlos%20Barbosa
 
 ### Typography
 
-        h1
+    h1
     h2
     h3
     h4
@@ -211,7 +211,6 @@ http://brackets.dnbard.com/author/Antonio%20Carlos%20Barbosa
     bs4linkbuttonprimary
     bs4linkbuttonsuccess
     bs4linkbuttonwarning
-
 
     bs4blocklinkbutton
     bs4blocklinkbuttondanger
